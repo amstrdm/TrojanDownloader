@@ -3,7 +3,7 @@
 
 ## How it works
 First the victim has to install the requirements listed in ```requirements.txt``` these include ```pygame``` and ```requests```.
-Pygame will be used for the game which acts as a decoy and requirements will be used to downlaod the file the attacker wants the victim to download onto the pc.
+Pygame will be used for the game which acts as a decoy and requirements will be used to download the file the attacker wants the victim to download onto the pc.
 
 Next the victim will execute the game by running ```python3 main.py```
 The program will then get the CWD (current working directory) and navigate into ```/assets/soundssfx/grenades/bullets/dep/```  and run ```assets.py```
