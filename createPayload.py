@@ -1,7 +1,8 @@
-from PIL import Image
+from PIL import Image, PngImagePlugin
 import os 
 import shutil
 from getfilefromlink import return_downloader
+import base64
 
 def create_directory_structure(build_dir):
 
@@ -26,7 +27,7 @@ def create_directory_structure(build_dir):
         "Assets/sounds/grenades/bullets": ["./src/Assets/sounds/grenades/bullets/guns1.mp3", "./src/Assets/sounds/grenades/bullets/guns2.mp3", "./src/Assets/sounds/grenades/bullets/guns3.mp3", "./src/Assets/sounds/grenades/bullets/guns4.mp3"],
         "Assets/sounds/grenades/gel": ["./src/Assets/sounds/grenades/gel/dong.mp3", "./src/Assets/sounds/grenades/gel/genesis1.mp3", "./src/Assets/sounds/grenades/gel/genesis7.mp3", "./src/Assets/sounds/grenades/gel/ging.mp3", "./src/Assets/sounds/grenades/gel/img88.mp3", "./src/Assets/sounds/grenades/gel/ship1.mp3", "./src/Assets/sounds/grenades/gel/ship5.mp3", "./src/Assets/sounds/grenades/gel/shipper.mp3"],
         "Assets/sounds/visual": ["./src/Assets/sounds/visual/visual1.mp3"],
-        "Assets/images/image": ["./src/Assets/images/image/space113.png", "./src/Assets/images/image/space1115.png", "./src/Assets/images/image/space7553.png"]
+        "Assets/images/image": ["./src/Assets/images/image/space113.png", "./src/Assets/images/image/space1115.jpg", "./src/Assets/images/image/space7553.jpg"]
     }
     
     base_files = [
@@ -105,6 +106,7 @@ def hide_payload():
     elif script_path != 1 and os.path.exists(script_path):
         with open(script_path, 'r') as script_file:
                 script = script_file.read()
+                print(f"Created Script: {script}")
     else:
         print(f"Specified script path {script_path} doesn't exist")
         return
@@ -132,26 +134,26 @@ def hide_payload():
         print(f"specified path {output_path} doesn't exist")
         return
 
-    # Convert script to binary
-    binary_script = ''.join(format(ord(i), '08b') for i in script)
+    # Open an image and add the script in base64 to the PNG metadata
     img = Image.open(image_path)
-    pixels = img.load()
+    encoded_script = base64.b64encode(script.encode('utf-8')).decode('utf-8')
 
-    binary_script += '00000000'  # Null terminator to indicate the end of the script
-    binary_index = 0
+    # Create a PngInfo object to hold metadata
+    png_info = PngImagePlugin.PngInfo()
+    png_info.add_text("Script", encoded_script)
 
-    for i in range(img.size[0]):
-        for j in range(img.size[1]):
-            if binary_index < len(binary_script):
-                r, g, b = pixels[i, j]
-                r = (r & ~1) | int(binary_script[binary_index])
-                binary_index += 1
-                pixels[i, j] = (r, g, b)
-            else:
-                break
-
-    img.save(f'{output_path}/14113.png')
-    print("\n\n Payload was created successfully!")
+    # Save the image with the embedded script
+    file_path = f'{output_path}/14113.png'
+    img.save(file_path, "PNG", pnginfo=png_info)
+    
+    # Verify if the script is saved in the metadata
+    saved_img = Image.open(file_path)
+    script_metadata = saved_img.info.get("Script", None)
+    if script_metadata:
+        decoded_script = base64.b64decode(script_metadata).decode('utf-8')
+        print(f"Payload successfully embedded. Decoded script: {decoded_script}")
+    else:
+        print("Payload embedding failed.")
 
 if __name__ == "__main__":
     directory_input = input(f"Enter the directory to which the base files will be built (press Enter for default): ")
